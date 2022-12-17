@@ -161,5 +161,30 @@ RSpec.describe Tag, type: :model do
 
       expect(results).to eq [tag, similar_tag]
     end
+
+    it 'returns empty results if limit is 0' do
+      tag = Fabricate(:tag, name: "MATCH")
+      _miss_tag = Fabricate(:tag, name: "miss")
+
+      results = Tag.search_for("match", 0)
+
+      expect(results).to eq []
+    end
+
+    it 'defaults limit to 5 if limit is not specified' do
+      tags = [*0..5].map {|n| Fabricate(:tag, name: "match#{n}")}
+
+      results = Tag.search_for("match")
+
+      expect(results).to eq(tags[0..4])
+    end
+
+    it 'defaults limit to 5 if limit is specified as nil' do
+      tags = [*0..5].map {|n| Fabricate(:tag, name: "match#{n}")}
+
+      results = Tag.search_for("match", nil)
+
+      expect(results).to eq(tags[0..4])
+    end
   end
 end

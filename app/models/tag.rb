@@ -114,6 +114,7 @@ class Tag < ApplicationRecord
     end
 
     def search_for(term, limit = 5, offset = 0, options = {})
+      limit ||= 5
       stripped_term = term.strip
 
       query = Tag.listable.matches_name(stripped_term)
