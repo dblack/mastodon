@@ -5,12 +5,12 @@ class SearchService < BaseService
     @query   = query&.strip
     @account = account
     @options = options
-    @limit   = limit.to_i
+    @limit   = normalize_limit(limit)
     @offset  = options[:type].blank? ? 0 : options[:offset].to_i
     @resolve = options[:resolve] || false
 
     default_results.tap do |results|
-      next if @query.blank? || @limit.zero?
+      next unless verify_query_and_limit
 
       if url_query?
         results.merge!(url_resource_results) unless url_resource.nil? || @offset.positive? || (@options[:type].present? && url_resource_symbol != @options[:type].to_sym)
@@ -23,6 +23,14 @@ class SearchService < BaseService
   end
 
   private
+
+  def normalize_limit(limit)
+    limit.nil? ? limit : limit.to_i
+  end
+
+  def verify_query_and_limit
+    @query.present? || @limit.nil? || @limit.nonzero?
+  end
 
   def perform_accounts_search!
     AccountSearchService.new.call(

@@ -33,6 +33,8 @@ class Tag < ApplicationRecord
   HASHTAG_NAME_RE = /\A(#{HASHTAG_NAME_PAT})\z/i
   HASHTAG_INVALID_CHARS_RE = /[^[:alnum:]#{HASHTAG_SEPARATORS}]/
 
+  DEFAULT_RESULT_LIMIT = 5
+
   validates :name, presence: true, format: { with: HASHTAG_NAME_RE }
   validates :display_name, format: { with: HASHTAG_NAME_RE }
   validate :validate_name_change, if: -> { !new_record? && name_changed? }
@@ -113,8 +115,8 @@ class Tag < ApplicationRecord
       end
     end
 
-    def search_for(term, limit = 5, offset = 0, options = {})
-      limit ||= 5
+    def search_for(term, limit = DEFAULT_RESULT_LIMIT, offset = 0, options = {})
+      limit ||= DEFAULT_RESULT_LIMIT
       stripped_term = term.strip
 
       query = Tag.listable.matches_name(stripped_term)

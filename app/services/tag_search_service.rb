@@ -4,7 +4,7 @@ class TagSearchService < BaseService
   def call(query, options = {})
     @query   = query.strip.sub(/\A#/, '')
     @offset  = options.delete(:offset).to_i
-    @limit   = options.delete(:limit).to_i
+    @limit   = normalize_limit(options.delete(:limit))
     @options = options
 
     results   = from_elasticsearch if Chewy.enabled?
@@ -14,6 +14,10 @@ class TagSearchService < BaseService
   end
 
   private
+
+  def normalize_limit(limit)
+    limit.nil? ? limit : limit.to_i
+  end
 
   def from_elasticsearch
     query = {

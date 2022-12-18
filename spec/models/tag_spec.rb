@@ -135,6 +135,7 @@ RSpec.describe Tag, type: :model do
   end
 
   describe '.search_for' do
+    let(:limit) { Tag::DEFAULT_RESULT_LIMIT }
     it 'finds tag records with matching names' do
       tag = Fabricate(:tag, name: "match")
       _miss_tag = Fabricate(:tag, name: "miss")
@@ -164,27 +165,26 @@ RSpec.describe Tag, type: :model do
 
     it 'returns empty results if limit is 0' do
       tag = Fabricate(:tag, name: "MATCH")
-      _miss_tag = Fabricate(:tag, name: "miss")
 
       results = Tag.search_for("match", 0)
 
       expect(results).to eq []
     end
 
-    it 'defaults limit to 5 if limit is not specified' do
-      tags = [*0..5].map {|n| Fabricate(:tag, name: "match#{n}")}
+    it 'defaults limit to DEFAULT_RESULT_LIMIT if limit is not specified' do
+      tags = limit.times.map {|n| Fabricate(:tag, name: "match#{n}")}
 
       results = Tag.search_for("match")
 
-      expect(results).to eq(tags[0..4])
+      expect(results).to eq(tags[0...limit])
     end
 
-    it 'defaults limit to 5 if limit is specified as nil' do
-      tags = [*0..5].map {|n| Fabricate(:tag, name: "match#{n}")}
+    it 'defaults limit to DEFAULT_RESULT_LIMIT if limit is specified as nil' do
+      tags = limit.times.map {|n| Fabricate(:tag, name: "match#{n}")}
 
       results = Tag.search_for("match", nil)
 
-      expect(results).to eq(tags[0..4])
+      expect(results).to eq(tags[0...limit])
     end
   end
 end

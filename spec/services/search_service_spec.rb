@@ -83,6 +83,15 @@ describe SearchService, type: :service do
           expect(Tag).to have_received(:search_for).with('tag', 10, 0, exclude_unreviewed: nil)
           expect(results).to eq empty_results.merge(hashtags: [tag])
         end
+        it 'passes a limit of nil down to Tag' do
+          query = '#tag'
+          tag = Tag.new
+          allow(Tag).to receive(:search_for).with('tag', nil, 0, exclude_unreviewed: nil).and_return([tag])
+
+          results = subject.call(query, nil, nil)
+          expect(Tag).to have_received(:search_for).with('tag', nil, 0, exclude_unreviewed: nil)
+          expect(results).to eq empty_results.merge(hashtags: [tag])
+        end
         it 'does not include tag when starts with @ character' do
           query = '@username'
           allow(Tag).to receive(:search_for)
